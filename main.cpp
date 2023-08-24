@@ -10,7 +10,8 @@ int main()
 
     while (game.running())
     {
-
+        //Init srand
+        std::srand(static_cast<unsigned>(time(NULL)));
     
         //udate
         game.update();
