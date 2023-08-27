@@ -25,6 +25,7 @@ private:
 	//Mouse positions
 
 	sf::Vector2i mousePosWindow;
+	sf::Vector2f mousePosview;
 
 	//Game logic
 	int points;
@@ -56,7 +57,7 @@ public:
 
 	void poll_events();
 	void updateMousePsitions();
-	void updateEnamies();
+	void updateEnemies();
 	void update();
 
 	void renderEnemies();

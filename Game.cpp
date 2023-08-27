@@ -9,9 +9,9 @@ void Game::initVariables()
     //Game logic
 
     this->points = 0;
-    this->enemySpawnTimer = 1000.f;
-    this->enemySpawnTimerMax = 1000.f;
-    this->maxEnemies = 5;
+    this->enemySpawnTimer = 0.f;
+    this->enemySpawnTimerMax = 10.f;
+    this->maxEnemies = 10;
 
 }
 
@@ -30,8 +30,8 @@ void Game::initEnemies()
     this->enemy.setSize(sf::Vector2f(100.f, 100.f));
     this->enemy.setScale(sf::Vector2f(0.5f, 0.5f));
     this->enemy.setFillColor(sf::Color::Cyan);
-    this->enemy.setOutlineColor(sf::Color::Red);
-    this->enemy.setOutlineThickness(2.f);
+    //this->enemy.setOutlineColor(sf::Color::Red);
+    //this->enemy.setOutlineThickness(2.f);
 }
 
 //constructors, destructors
@@ -70,11 +70,11 @@ void Game::spawnEnemy()
     */
 
     this->enemy.setPosition(
-        static_cast<float>(rand()% static_cast<int>(this->window->getSize().x - this->enemy.getSize().x)),
+        static_cast<float>(rand() % static_cast<int>(this->window->getSize().x - this->enemy.getSize().x)),
         0.f
     );
 
-    this->enemy.setFillColor(sf::Color::Blue);
+    this->enemy.setFillColor(sf::Color::Green);
 
     //Spawn the enemy
     this->enemies.push_back(this->enemy);
@@ -105,9 +105,10 @@ void Game::updateMousePsitions()
     // Updates mouse position
         /// Mouse position relative to window - vector 2i
     this->mousePosWindow = sf::Mouse::getPosition(*this->window);
+    this->mousePosview = this->window->mapPixelToCoords(this->mousePosWindow);
 }
 
-void Game::updateEnamies()
+void Game::updateEnemies()
 {
     /*
         @return void
@@ -117,7 +118,7 @@ void Game::updateEnamies()
     */
 
     //Upgating the timer for enemy spawning
-    if (this->enemies.size() <= this->enemySpawnTimerMax)
+    if (this->enemies.size() < this->maxEnemies)
     {
         if (this->enemySpawnTimer >= this->enemySpawnTimerMax)
         {
@@ -128,10 +129,35 @@ void Game::updateEnamies()
         else
             this->enemySpawnTimer += 1.f;
     }
-    //Move the enemies
-    for (auto& e : this->enemies)
+    //Moving and updateing the enemies
+    for (int i = 0; i < this->enemies.size(); i++)
     {
-        e.move(0.f, 2.f);
+        bool deleted = false;
+
+        this->enemies[i].move(0.f, 1.f);
+        //Check if clicked upon
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        {
+            if (this->enemies[i].getGlobalBounds().contains(this->mousePosview))
+            {
+                deleted = true;
+
+                //Gain points
+                this->points += 10.f;
+            }
+        }
+
+        //If the enemy is past the bottom of the screen
+        if (this->enemies[i].getPosition().y > this->window->getSize().y)
+        {
+            deleted = true;
+        }
+
+        if (deleted)
+        {
+            this->enemies.erase(this->enemies.begin() + i);
+        }
     }
 
 }
@@ -142,7 +168,7 @@ void Game::update()
 
     this->updateMousePsitions();
 
-    this->updateEnamies();
+    this->updateEnemies();
 
 }
 
